@@ -31,4 +31,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Apply migrations, then serve with gunicorn.
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn polylife.wsgi:application -b 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py seed_users && gunicorn polylife.wsgi:application -b 0.0.0.0:8000"]

@@ -1,25 +1,33 @@
 # Team team5 — Roadmap
 
-Your team's starting point. The stack already runs end-to-end with a
-**placeholder** app; replace the placeholder with your real service step by step.
+Your team's workspace. It's a Django app skeleton plus everything needed to run
+behind the shared gateway. Build it up step by step.
 
-## Run it
-1. Make sure the **core** is running first (repo root: `docker compose up`).
-2. From this folder: `docker compose up --build`
+## Start (you barely touch Docker)
+1. Make sure the **core** is running (ask your TA, or run `scripts/start-core.ps1`).
+2. In this folder run:  **`.\run.ps1`**  (Windows) or **`./run.sh`** (mac/Linux)
+   - it creates `.env` from `.env.example` and starts your stack.
 3. Open **http://localhost:9105**
 
-## What you get (already wired)
-- **gateway** (nginx) — authenticates each `/api/` request against the core and
-  injects `X-User-Id` / `X-User-Username`, then proxies to your app.
-- **app** — placeholder on port 8000. **Replace `app/` with your code.**
-- **db** — your own PostgreSQL, isolated from other teams:
-  - database `team5` · user `team5_user` · password `plf_team5_D5k1Jr`
+> Out of the box only the **gateway** runs, so app routes return `502` until you
+> add your backend — that's expected. Your first job is to build the service.
+
+## What's here
+| File | What it is |
+|------|------------|
+| `models.py` `views.py` `urls.py` `admin.py` `tests.py` | your Django app |
+| `migrations/` `static/team5/` `templates/team5/` | app folders |
+| `Dockerfile` | how your backend is built (replace with your stack) |
+| `docker-compose.yml` | gateway (+ commented backend/db you enable) |
+| `gateway.conf` | authenticates `/api/` against the core, then proxies to you |
+| `.env.example` | your port, DB credentials, secret — **secrets live here, not in compose** |
 
 ## Roadmap (suggested order)
-- [ ] Replace `app/` with your stack (frontend + backend may live together).
-- [ ] Read `X-User-Id` / `X-User-Username` from the request headers —
-      **do not decode JWTs yourself**; the gateway + core already did.
-- [ ] Connect to your database using the `DATABASE_URL` env var.
-- [ ] Build your features. Keep serving on port **8000**.
+- [ ] Build your backend so it listens on port **8000** (`Dockerfile`).
+- [ ] Uncomment `backend` and `db` in `docker-compose.yml`.
+- [ ] Read `X-User-Id` / `X-User-Username` from request headers — the gateway +
+      core already authenticated the user; **never decode JWTs yourself**.
+- [ ] Use `DATABASE_URL` (from `.env`) for your own database.
+- [ ] Add models, views, urls, and tests. Build your features.
 
-> The password above is **dev-only**. Change it before any real deployment.
+> The password in `.env.example` is **dev-only**. Change it for any real use.
