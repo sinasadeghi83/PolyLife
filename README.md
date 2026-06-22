@@ -1,4 +1,24 @@
-# Welcome to your organization's demo respository
-This code repository (or "repo") is designed to demonstrate the best GitHub has to offer with the least amount of noise.
+# PolyLife — هسته (Core)
 
-The repo includes an `index.html` file (so it can render a web page), two GitHub Actions workflows, and a CSS stylesheet dependency.
+پروژه درس مهندسی نرم‌افزار ۱ — سال ۱۴۰۴/۱۴۰۵.
+
+این مخزن، **هسته (core)** پروژه‌ی PolyLife است: یک پروژه‌ی Django که زیرساخت مشترک (احراز هویت، صفحه‌ی فرود/هوم‌پیج، و دروازه‌ی ارتباط با میکروسرویس تیم‌ها) را فراهم می‌کند. هر تیم دانشجویی، اپلیکیشن خودش را به‌صورت یک ماژول مستقل با **پایگاه‌داده‌ی مجزا** و **API gateway اختصاصی** کنار این هسته توسعه می‌دهد.
+
+## ساختار کلی (در حال توسعه)
+
+```
+polylife/        پروژه‌ی Django (settings, urls, wsgi/asgi)
+core/            اپ هسته: احراز هویت، مدل User، middleware، صفحه‌ی فرود
+  frontend/      صفحه‌ی فرود (Vite + React)
+teams/           پوشه‌ی تیم‌ها (قالب اولیه برای هر تیم)
+docker/          فایل‌های Docker و اسکریپت‌های اجرا
+```
+
+## اجرا
+
+دو روش پشتیبانی می‌شود:
+
+1. **با Docker** — اجرای `docker compose` از طریق اسکریپت‌های آماده (ویندوز/لینوکس)، بدون درگیر شدن با جزئیات Docker.
+2. **بدون Docker** — اجرای مستقیم هسته و پروژه‌ی تیم روی پایتون محلی.
+
+جزئیات اجرا در ادامه‌ی توسعه به همین فایل اضافه می‌شود.
