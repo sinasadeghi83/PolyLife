@@ -19,7 +19,10 @@ env = environ.Env(
 environ.Env.read_env(BASE_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key secret in production!
-SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-change-me")
+SECRET_KEY = env(
+    "DJANGO_SECRET_KEY",
+    default="dev-only-insecure-secret-key-change-me-in-production",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
@@ -107,3 +110,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom user model (email-based), shared by the core and all team apps.
 AUTH_USER_MODEL = "core.User"
+
+# JWT authentication
+JWT_SECRET = env("JWT_SECRET", default=SECRET_KEY)
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TTL_SECONDS = env.int("JWT_ACCESS_TTL_SECONDS", default=15 * 60)  # 15 minutes
+JWT_REFRESH_TTL_SECONDS = env.int("JWT_REFRESH_TTL_SECONDS", default=7 * 24 * 60 * 60)  # 7 days
