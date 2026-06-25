@@ -24,7 +24,7 @@ export default function Register() {
 
   const checkPasswordStrength = (pass) => {
     let strength = 0;
-    if (pass.length >= 6) strength++;
+    if (pass.length >= 8) strength++;        // backend: minimum length is 8
     if (pass.match(/[a-z]/) && pass.match(/[A-Z]/)) strength++;
     if (pass.match(/[0-9]/)) strength++;
     if (pass.match(/[^a-zA-Z0-9]/)) strength++;
@@ -42,10 +42,17 @@ export default function Register() {
       toast.error('رمز عبور و تکرار آن مطابقت ندارد');
       return;
     }
-    if (passwordStrength < 2) {
-      toast.error('رمز عبور ضعیف است');
+    // Mirror the backend's password rules (Django validators):
+    if (password.length < 8) {
+      toast.error('رمز عبور باید حداقل ۸ کاراکتر باشد');
       return;
     }
+    if (/^\d+$/.test(password)) {
+      toast.error('رمز عبور نباید فقط شامل عدد باشد');
+      return;
+    }
+    // "common password" and "similar to username" are checked server-side and
+    // surfaced via the API error toast below.
     try {
       await api.register({ username, password });
       toast.success('ثبت نام با موفقیت انجام شد!');
