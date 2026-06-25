@@ -4,11 +4,13 @@ services:
     container_name: polylife-core
     ports:
       - "8000:8000"
-    environment:
-      DEBUG: "False"
-      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,core"
-      DJANGO_SECRET_KEY: "dev-only-insecure-secret-key-change-me-in-production"
-      JWT_SECRET: "dev-only-insecure-jwt-secret-change-me-in-production"
+    # Config & secrets come from .env (copy .env.example -> .env).
+    # The start script creates it for you; never hard-code secrets here.
+    # required: false -> a missing .env falls back to settings defaults
+    # (so CI builds and `down` don't fail before .env exists).
+    env_file:
+      - path: .env
+        required: false
     networks:
       - polylife
     restart: unless-stopped

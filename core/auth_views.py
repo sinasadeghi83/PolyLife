@@ -15,6 +15,7 @@ These views are CSRF-exempt because they are token-authenticated APIs.
 import json
 from urllib.parse import quote
 
+import jwt
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -23,7 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from core.auth import api_login_required
-from core.jwt_utils import make_access_token
+from core.jwt_utils import REFRESH, decode_token, make_access_token, make_refresh_token
 
 User = get_user_model()
 
@@ -101,6 +102,7 @@ def login(request):
             "success": True,
             "message": "ورود با موفقیت انجام شد",
             "token": make_access_token(user),
+            "refresh": make_refresh_token(user),
             "user": _user_dict(user),
         }
     )
@@ -138,3 +140,26 @@ def verify(request):
     resp["X-User-Id"] = str(request.user.id)
     resp["X-User-Username"] = quote(request.user.username)
     return resp
+
+
+@csrf_exempt
+@require_POST
+def refresh(request):
+    """Exchange a valid refresh token for a fresh access token."""
+    token = (_json_body(request) or {}).get("refresh")
+    if not token:
+        return _error("refresh token الزامی است", 401)
+
+    try:
+        payload = decode_token(token)
+    except jwt.InvalidTokenError:
+        return _error("توکن نامعتبر است", 401)
+
+    if payload.get("type") != REFRESH:
+        return _error("توکن نامعتبر است", 401)
+
+    user = User.objects.filter(id=payload.get("sub"), is_active=True).first()
+    if user is None or user.token_version != payload.get("tv"):
+        return _error("توکن نامعتبر است", 401)
+
+    return JsonResponse({"success": True, "token": make_access_token(user)})

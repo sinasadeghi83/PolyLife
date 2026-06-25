@@ -1,18 +1,33 @@
 // src/components/Navbar.jsx
-import { Link, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import * as api from '../services/api';
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const menuItems = ["ارتباط با ما", "منابع", "داستان های موفقیت", "خدمات"];
+
+  // If the visitor already has a valid session, remember who they are.
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    if (!api.getToken()) return;
+    api
+      .getCurrentUser()
+      .then((data) => setUser(data.user))
+      .catch(() => {
+        api.clearToken(); // stale/invalid token
+        setUser(null);
+      });
+  }, []);
 
   // تشخیص صفحه فعلی
   const isLoginPage = location.pathname === '/login';
-  const isRegisterPage = location.pathname === '/register';
   const isHomePage = location.pathname === '/';
 
   return (
     <nav className="fixed top-6 left-6 right-6 z-50 flex items-center justify-between px-6 py-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-full shadow-2xl">
-      
+
       {/* سمت چپ */}
       <div className="flex items-center gap-2">
         {isHomePage ? (
@@ -43,12 +58,24 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* سمت راست */}
-      <Link to={isLoginPage ? "/login" : "/register"}>
-        <div className="text-white font-semibold px-4 py-1 text-sm bg-[#185E64]/50 rounded-full hover:bg-[#185E64] transition">
-          {isLoginPage ? "ورود" : isRegisterPage ? "ثبت‌نام" : "ثبت‌نام"}
+      {/* سمت راست: اگر کاربر لاگین کرده، نامش + دکمه داشبورد؛ وگرنه ورود/ثبت‌نام */}
+      {user ? (
+        <div className="flex items-center gap-3">
+          <span className="text-white font-medium text-sm">سلام، {user.username}</span>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-white font-semibold px-4 py-1 text-sm bg-[#185E64]/50 rounded-full hover:bg-[#185E64] transition"
+          >
+            داشبورد
+          </button>
         </div>
-      </Link>
+      ) : (
+        <Link to={isLoginPage ? "/login" : "/register"}>
+          <div className="text-white font-semibold px-4 py-1 text-sm bg-[#185E64]/50 rounded-full hover:bg-[#185E64] transition">
+            {isLoginPage ? "ورود" : "ثبت‌نام"}
+          </div>
+        </Link>
+      )}
     </nav>
   );
 }

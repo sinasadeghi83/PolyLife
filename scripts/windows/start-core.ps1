@@ -4,6 +4,7 @@ $ErrorActionPreference = "Stop"
 $root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 Push-Location $root
 try {
+    if (-not (Test-Path .env)) { Copy-Item .env.example .env; Write-Host "Created .env" }
     docker compose up --build
 } finally {
     Pop-Location
