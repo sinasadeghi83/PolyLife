@@ -24,6 +24,17 @@ with its **own database** and **own gateway** — behind this core.
 - **Auth:** username + password → JWT. The core verifies the token; teams never
   decode JWTs — their gateway calls `/api/verify` and forwards the `X-User-*`
   headers to the backend.
+
+  ## Suggested flow
+
+1. **Register** — `POST /api/register` with `{"username": "ali", "password": "Sup3rSecretPass"}`.
+2. **Login** — `POST /api/login` with the same credentials. Copy `token` and `refresh` from the response.
+3. **Get user** — `GET /api/user` with `Authorization: Bearer <token>`.
+4. **Refresh** — `POST /api/refresh` with `{"refresh": "<refresh>"}` → a fresh `token`.
+5. **Verify** — `GET /api/verify` with the Bearer token → check the `X-User-*` response headers (this is what a team gateway calls).
+6. **Logout** — `POST /api/logout` with the Bearer token. Afterwards the same token/refresh stop working.
+
+
 - **Isolation:** each team has its own database with its own user/password.
 
 ## Layout
@@ -64,6 +75,8 @@ page plus the fully working API.)
 ```powershell
 .\.venv\Scripts\python.exe manage.py test core
 ```
+
+To exercise the API by hand (Postman / curl), see [docs/API_TESTING.md](docs/API_TESTING.md).
 
 ## Configuration
 
