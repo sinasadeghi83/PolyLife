@@ -148,13 +148,16 @@ docker compose exec backend bash
 > The **17 sprint tickets** (SCRUM-1, 2, 4–10 from Sprint 1 + SCRUM-11–18
 > from Sprint 2) were created on 2026-07-19 via the Atlassian REST API.
 > All are in the `Sprint 1` or `Sprint 2` column (To Do) with the right
-> assignees and labels.
+> assignees and labels. Current explicit ownership changes include
+> `SCRUM-4` and `SCRUM-5` assigned to Sina Sadeghi, and `SCRUM-14` assigned
+> to Amirali Rahimi. The Summary prefix on every Jira issue matches its
+> actual issue key.
 >
 > **Note on key numbering:** The intended ticket sequence had no
-> SCRUM-3 (SCRUM-10 was dropped as redundant — see
-> `.agents/06_task_assignment.md` §4). The Jira internal counter assigned
-> keys sequentially as tickets were created, so the actual project keys
-> are SCRUM-1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18.
+> SCRUM-3 because the helper-scripts ticket was dropped. The Jira internal
+> counter assigned keys sequentially as tickets were created, so the actual
+> project keys are SCRUM-1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+> 16, 17, 18.
 > Each ticket's **summary** uses its actual Jira key (e.g. Jira key
 > `SCRUM-4` has summary `[SCRUM-4] Backend skeleton (FastAPI) + Dockerfile +
 > compose`).
