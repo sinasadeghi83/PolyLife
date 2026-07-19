@@ -45,7 +45,7 @@ teams/team7/
 ├── AGENTS.md                ← you are here
 ├── README.md                ← user-facing run instructions
 ├── .agents/                 ← planning docs (do not delete)
-├── backend/                 ← our FastAPI service (Sprint 1 ticket SCRUM-3)
+├── backend/                 ← our FastAPI service (Sprint 1 ticket SCRUM-4)
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── pyproject.toml
@@ -155,14 +155,67 @@ docker compose exec backend bash
 > `.agents/06_task_assignment.md` §4). The Jira internal counter assigned
 > keys sequentially as tickets were created, so the actual project keys
 > are SCRUM-1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18.
-> Each ticket's **summary** carries the original `[SCRUM-N]` label that
-> matches the docs (e.g. Jira key `SCRUM-4` has summary
-> `[SCRUM-3] Backend skeleton (FastAPI) + Dockerfile + compose`).
+> Each ticket's **summary** uses its actual Jira key (e.g. Jira key
+> `SCRUM-4` has summary `[SCRUM-4] Backend skeleton (FastAPI) + Dockerfile +
+> compose`).
 >
-> **Recovered from an earlier mistake:** an intermediate project
-> `PolyLife — Team 7` with key `PL7` was briefly created and then deleted
-> because the user clarified to use the pre-existing `SE1 Team 7` (key
-> `SCRUM`) space. All ticket references in these docs now use `SCRUM`.
+**Recovered from an earlier mistake:** an intermediate project
+`PolyLife — Team 7` with key `PL7` was briefly created and then deleted
+because the user clarified to use the pre-existing `SE1 Team 7` (key
+`SCRUM`) space. All ticket references in these docs now use `SCRUM`.
+
+> **Runtime requirement for further Jira automation:** the
+> `ATLASSIAN_API_KEY` environment variable must be set in the agent's
+> runtime. It is only available inside the **Hermes** environment
+> (Sina S.'s AI-agent shell); it is **not** in the repo, in `.env`, or
+> on any teammate's machine. Any agent that does not see this variable
+> in its shell must **not** attempt to create or modify Jira issues
+> — it should treat the 17 tickets in `SE1 Team 7` / `SCRUM` as the
+> source of truth and have the user do new wiring manually at
+> <https://sinasadeghi83.atlassian.net/jira/software/projects/SCRUM/boards/1>.
+
+### 7.1 Pre-flight check (mandatory before any Jira API call)
+
+```bash
+# 1. Token is present and non-empty
+[ -n "$ATLASSIAN_API_KEY" ] || { echo "FATAL: ATLASSIAN_API_KEY not set"; exit 1; }
+echo "Token length: ${#ATLASSIAN_API_KEY} chars"   # expect 192 + "ATAT" prefix
+
+# 2. Token is valid against the site
+curl -fsS -u "sina.sadeghi83@gmail.com:${ATLASSIAN_API_KEY}" \
+  "https://sinasadeghi83.atlassian.net/rest/api/3/myself" \
+  -H "Accept: application/json" | python3 -c "import sys,json; d=json.load(sys.stdin); print('OK:', d.get('displayName'))"
+```
+
+- If step 1 fails → **stop and tell the user** ("`ATLASSIAN_API_KEY` is
+  not present in this environment; I cannot talk to Jira. If you want
+  this wired automatically, set the token in the runtime's env.").
+- If step 2 fails (401) → **stop and tell the user** ("Token is set but
+  rejected; it may be expired or revoked. Generate a new one at
+  <https://id.atlassian.com/manage-profile/security/api-tokens>.").
+
+### 7.2 What "no env access" looks like in practice
+
+- A teammate's laptop: no `ATLASSIAN_API_KEY` in their shell — the
+  agent should treat the 17 existing tickets as the source of truth and
+  ask the user to do any new wiring manually via the Jira web UI.
+- GitHub Actions / CI: no `ATLASSIAN_API_KEY` in the runner env — the
+  agent should **not** try to create or modify issues from CI; failures
+  of this kind should be flagged to Sina S. for manual handling.
+- A different AI agent's sandbox (e.g. some other Claude / GPT
+  session): the variable is per-runtime, not per-repo, so the same
+  `sinasadeghi83/PolyLife` checkout in a different sandbox will not
+  see it. The agent should say so explicitly rather than silently
+  failing.
+
+### 7.3 Token rotation
+
+- If a new token is generated, the old one stops working immediately
+  (Atlassian API tokens are **not** reversible).
+- The agent must **not** log, echo, or persist the token value anywhere
+  — read it from the env, use it, forget it.
+- Token regeneration URL:
+  <https://id.atlassian.com/manage-profile/security/api-tokens>.
 
 ## 8. Open questions (resolve before coding the relevant ticket)
 
