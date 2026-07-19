@@ -45,7 +45,7 @@ teams/team7/
 ├── AGENTS.md                ← you are here
 ├── README.md                ← user-facing run instructions
 ├── .agents/                 ← planning docs (do not delete)
-├── backend/                 ← our FastAPI service (Sprint 1 ticket SCRUM-3)
+├── backend/                 ← our FastAPI service (Sprint 1 ticket SCRUM-4)
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── pyproject.toml
@@ -155,14 +155,26 @@ docker compose exec backend bash
 > `.agents/06_task_assignment.md` §4). The Jira internal counter assigned
 > keys sequentially as tickets were created, so the actual project keys
 > are SCRUM-1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18.
-> Each ticket's **summary** carries the original `[SCRUM-N]` label that
-> matches the docs (e.g. Jira key `SCRUM-4` has summary
-> `[SCRUM-3] Backend skeleton (FastAPI) + Dockerfile + compose`).
+> Each ticket's **summary** uses its actual Jira key (e.g. Jira key
+> `SCRUM-4` has summary `[SCRUM-4] Backend skeleton (FastAPI) + Dockerfile +
+> compose`).
 >
-> **Recovered from an earlier mistake:** an intermediate project
-> `PolyLife — Team 7` with key `PL7` was briefly created and then deleted
-> because the user clarified to use the pre-existing `SE1 Team 7` (key
-> `SCRUM`) space. All ticket references in these docs now use `SCRUM`.
+**Recovered from an earlier mistake:** an intermediate project
+`PolyLife — Team 7` with key `PL7` was briefly created and then deleted
+because the user clarified to use the pre-existing `SE1 Team 7` (key
+`SCRUM`) space. All ticket references in these docs now use `SCRUM`.
+
+> **Runtime requirement for further Jira automation:** the
+> `ATLASSIAN_API_KEY` environment variable must be set in the agent's
+> runtime. It is only available inside the **Hermes** environment
+> (Sina S.'s AI-agent shell); it is **not** in the repo, in `.env`, or
+> in any teammate's machine. Any agent that does not see this variable
+> in its shell must **not** attempt to create or modify Jira issues
+> — it should treat the 17 tickets in `SE1 Team 7` / `SCRUM` as the
+> source of truth and have the user do new wiring manually at
+> <https://sinasadeghi83.atlassian.net/jira/software/projects/SCRUM/boards/1>.
+> See [`AGENTS.md`](../../AGENTS.md) §7 for the full verification
+> procedure and rotation rules.
 
 ## 8. Open questions (resolve before coding the relevant ticket)
 

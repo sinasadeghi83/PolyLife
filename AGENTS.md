@@ -111,3 +111,55 @@ PowerShell mirrors in `scripts/windows/`.
   questions" (or resolve it there if it was open).
 - **Never commit secrets.** `.env` is git-ignored; `.env.example` is
   committed and contains dev-only placeholders.
+
+## 7. Required environment for automated Jira wiring
+
+To wire the project to Atlassian Jira via API (create the project, push
+tickets, manage members, etc.), the runtime environment must have
+**`ATLASSIAN_API_KEY`** exported as an environment variable. Concretely:
+
+- The token is **not** stored in the repo, in `.env`, in any helper
+  script, or in any markdown file.
+- The token is **only** available to the **Hermes** runtime (Sina S.'s
+  AI-agent shell) via its environment. The Hermes web UI / CLI / sandbox
+  inherits the variable; bare shells, CI runners, and other people's
+  machines do not.
+- The site base URL (e.g. `https://sinasadeghi83.atlassian.net`) and the
+  account email (`sina.sadeghi83@gmail.com`) are not secrets — they
+  live in `teams/team7/AGENTS.md` §7 — but the API token is **not** a
+  config value, it's a runtime dependency.
+
+**Before any agent tries to call the Jira REST API, it MUST verify:**
+
+```bash
+# 1. Token is present and non-empty
+[ -n "$ATLASSIAN_API_KEY" ] || { echo "FATAL: ATLASSIAN_API_KEY not set"; exit 1; }
+echo "Token length: ${#ATLASSIAN_API_KEY} chars"   # expect 192 + "ATAT" prefix
+
+# 2. Token is valid against the site
+curl -fsS -u "sina.sadeghi83@gmail.com:${ATLASSIAN_API_KEY}" \
+  "https://sinasadeghi83.atlassian.net/rest/api/3/myself" \
+  -H "Accept: application/json" | python3 -c "import sys,json; d=json.load(sys.stdin); print('OK:', d.get('displayName'))"
+```
+
+If step 1 fails → **stop and tell the user** ("`ATLASSIAN_API_KEY` is
+not present in this environment; I cannot talk to Jira. If you want
+this wired automatically, set the token in the runtime's env.").
+
+If step 2 fails (401) → **stop and tell the user** ("Token is set but
+rejected; it may be expired or revoked. Generate a new one at
+<https://id.atlassian.com/manage-profile/security/api-tokens>.").
+
+**If the agent is running in any environment that does NOT inherit
+`ATLASSIAN_API_KEY`** (e.g. a teammate's laptop, GitHub Actions, a
+different AI agent's sandbox), it must **not** try to create or modify
+Jira issues. Instead it should treat the 17 tickets already in the
+`SE1 Team 7` (key `SCRUM`) project as the source of truth and have the
+user do any new Jira wiring from
+<https://sinasadeghi83.atlassian.net/jira/software/projects/SCRUM/boards/1>
+manually.
+
+**Token rotation:** if a new token is generated, the old one stops
+working immediately (Atlassian API tokens are not reversible). The agent
+must not log, echo, or persist the token value anywhere — read it from
+the env, use it, forget it.
