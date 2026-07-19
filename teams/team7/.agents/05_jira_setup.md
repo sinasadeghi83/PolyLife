@@ -42,9 +42,9 @@ After admin signup:
 1. From the project home, click **Create Project**.
 2. **Type:** Scrum → **Use Template**.
 3. **Management:** **Team-managed** (not Company-managed).
-4. **Project name:** `PolyLife — Team 7`.
-5. **Project key:** auto-generated, e.g. `PL7` or `TEAM7`. We use this key as
-   a prefix on every issue id (e.g. `PL7-12`).
+4. **Project name:** `SE1 Team 7` (already exists in the Atlassian site; the key is `SCRUM`).
+5. **Project key:** auto-generated, e.g. `SCRUM` or `TEAM7`. We use this key as
+   a prefix on every issue id (e.g. `SCRUM-12`).
 
 ### 1.4 Members to invite
 Sina Sadeghi (admin) opens the project → **Invite People** and adds:
@@ -77,10 +77,10 @@ the parent of 2–5 Tasks.** Bugs are filed as they appear.
 ### 2.1 Naming convention
 
 ```
-PL7-12  [chat] implement POST /chat/threads
-PL7-13  [reserve] add Alembic migration for coach_availability
-PL7-14  [infra] wire team-up script
-PL7-15  [bug] 500 on /chat/ws when thread_id missing
+SCRUM-12  [chat] implement POST /chat/threads
+SCRUM-13  [reserve] add Alembic migration for coach_availability
+SCRUM-14  [infra] wire team-up script
+SCRUM-15  [bug] 500 on /chat/ws when thread_id missing
 ```
 
 - Brackets indicate which microservice / area the issue belongs to.
@@ -160,5 +160,5 @@ Template (in Persian, since the TA expects Persian notes):
 
 - Each issue must carry the **actual time** the member spent.
 - Each PR links to the Jira ticket via the commit message (e.g.
-  `PL7-12 #comment [chat] implement POST /chat/threads`).
+  `SCRUM-12 #comment [chat] implement POST /chat/threads`).
 - Velocity per sprint is recomputed at the end so we know if we're on track.

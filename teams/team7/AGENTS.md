@@ -45,7 +45,7 @@ teams/team7/
 ├── AGENTS.md                ← you are here
 ├── README.md                ← user-facing run instructions
 ├── .agents/                 ← planning docs (do not delete)
-├── backend/                 ← our FastAPI service (Sprint 1 ticket PL7-3)
+├── backend/                 ← our FastAPI service (Sprint 1 ticket SCRUM-3)
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── pyproject.toml
@@ -126,7 +126,7 @@ docker compose exec backend bash
    - `.agents/02_architecture_decisions.md` (the "why" behind every choice)
    - `.agents/03_database_design.md` (the schema)
    - `.agents/04_api_endpoints.md` (the contracts)
-2. **Pick a Jira ticket** (key prefix `PL7`, e.g. `PL7-7`). If none
+2. **Pick a Jira ticket** (key prefix `SCRUM`, e.g. `SCRUM-7`). If none
    matches your task, **create one** in the
    `sinasadeghi83.atlassian.net` project.
 3. **Create a branch** from `main`:
@@ -141,22 +141,18 @@ docker compose exec backend bash
 ## 7. Jira wiring (status as of 2026-07-19)
 
 > **Status:** Jira site exists at `sinasadeghi83.atlassian.net` (Sina S.
-> is site owner/admin). The project, board, and tickets are **not yet
-> wired by automation** because no API token has been stored in this
-> environment.
+> is site owner/admin). The Scrum project **`SE1 Team 7` (key `SCRUM`)** was
+> created on 2026-07-19 via the Atlassian REST API. It is **next-gen /
+> team-managed** (style verified via `GET /rest/api/3/project/SCRUM`).
 >
-> To finish wiring:
-> 1. Sina S. logs into `sinasadeghi83.atlassian.net`, creates the
->    `PolyLife — Team 7` Scrum project, and invites Sina N. + Amirali +
->    the scrum master.
-> 2. Someone (any of us, or an agent with the token) creates the 18
->    Sprint 1 + Sprint 2 tickets listed in
->    `.agents/06_task_assignment.md` §4 and §5.
-> 3. The Jira project key (e.g. `PL7` or `TEAM7`) gets recorded in
->    `.agents/05_jira_setup.md` §1.2.
-
-Until the project is created, agents can treat `06_task_assignment.md` as
-the source of truth and create the tickets manually.
+> The Scrum board and the 18 Sprint 1 + Sprint 2 tickets listed in
+> `.agents/06_task_assignment.md` §4–§5 will be created next. Until then,
+> `.agents/06_task_assignment.md` is the source of truth.
+>
+> **Note (recovered from an earlier mistake):** an intermediate project
+> `PolyLife — Team 7` with key `PL7` was briefly created and then deleted
+> because the user clarified to use the pre-existing `SE1 Team 7` (key
+> `SCRUM`) space. All ticket references in these docs now use `SCRUM`.
 
 ## 8. Open questions (resolve before coding the relevant ticket)
 

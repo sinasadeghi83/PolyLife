@@ -66,7 +66,7 @@ main              ← protected, never touched
 
 <optional body, wrapped at 72 cols, explaining why>
 
-PL7-<ticket-id>
+SCRUM-<ticket-id>
 ```
 
 ### 3.1 Examples
@@ -100,7 +100,7 @@ git commit -m "everything done"
 - One-paragraph summary.
 
 ## Why
-- Link to Jira ticket: PL7-XX
+- Link to Jira ticket: SCRUM-XX
 
 ## How to test
 - Step-by-step manual reproduction
