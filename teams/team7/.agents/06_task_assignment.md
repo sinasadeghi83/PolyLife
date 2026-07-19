@@ -133,7 +133,7 @@ If a member is blocked for >24 hours, escalate in the team channel.
 
 | Week | Sina S. | Sina N. | Amirali |
 |------|---------|---------|---------|
-| Sprint 1 (heavy infra) | 70 % chat backend, 30 % cross-cutting | 70 % reserve backend, 30 % cross-cutting | 100 % infra |
+| Sprint 1 (current Jira allocation; 23 points) | 65 % — backend, DB, auth, and chat (15 pts) | 13 % — reserve availability (3 pts) | 22 % — infrastructure, board, and gateway (5 pts) |
 | Sprint 2 (heavy features) | 60 % chat, 40 % review | 60 % reserve, 40 % review | 40 % infra/frontend, 60 % frontend |
 
 > Sprint 2 puts more weight on application code; we balance it so no one
