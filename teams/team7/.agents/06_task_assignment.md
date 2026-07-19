@@ -93,19 +93,19 @@ endpoint per service**. Story-point estimates in parens.
 |---|-------|-------|--------|
 | SCRUM-1 | Verify fork, add `upstream` remote, invite teammates as collaborators | AR | 1 |
 | SCRUM-2 | Create Jira board with Testing column | AR | 1 |
-| SCRUM-3 | Backend skeleton (FastAPI) + Dockerfile + compose | AR + SS | 3 |
-| SCRUM-4 | Postgres + Redis services in compose + update `.env.example` | AR | 2 |
-| SCRUM-5 | DB schema (all tables) + Alembic migrations | SN | 5 |
-| SCRUM-6 | `X-User-Id` dependency + smoke test | SS | 2 |
-| SCRUM-7 | Chat: list/create threads | SS | 3 |
-| SCRUM-8 | Reserve: list/create availability | SN | 3 |
-| SCRUM-9 | Nginx gateway: extend with WebSocket route for `/api/chat/ws` | AR | 3 |
+| SCRUM-4 | Backend skeleton (FastAPI) + Dockerfile + compose | SS | 3 |
+| SCRUM-5 | Postgres + Redis services in compose + update `.env.example` | SS | 2 |
+| SCRUM-6 | DB schema (all tables) + Alembic migrations | SS | 5 |
+| SCRUM-7 | `X-User-Id` dependency + smoke test | SS | 2 |
+| SCRUM-8 | Chat: list/create threads | SS | 3 |
+| SCRUM-9 | Reserve: list/create availability | SN | 3 |
+| SCRUM-10 | Nginx gateway: extend with WebSocket route for `/api/chat/ws` | AR | 3 |
 
-> SCRUM-10 (helper scripts) is **dropped** — `scripts/bash/*.sh` already exist
+> The helper-scripts ticket is **dropped** — `scripts/bash/*.sh` already exist
 > and the PDF's `team-up`/`all-up`/`all-down` map directly to them. See
 > `02_architecture_decisions.md` §6.
 
-**Total: 21 points** (was 25; helper-scripts ticket removed).
+**Total: 23 points** (Sprint 1; helper-scripts ticket removed).
 
 ## 5. Sprint 2 priorities (preview)
 
@@ -114,11 +114,11 @@ endpoint per service**. Story-point estimates in parens.
 | SCRUM-11 | Chat WebSocket + Redis pub/sub | SS | 8 |
 | SCRUM-12 | Reserve atomic booking + double-book test | SN | 5 |
 | SCRUM-13 | Ratings endpoint | SN | 3 |
-| SCRUM-14 | Coach online status endpoint | SS | 2 |
-| SCRUM-15 | Attachments upload | SS | 3 |
+| SCRUM-14 | Coach online status endpoint | AR | 2 |
+| SCRUM-15 | Attachments upload | AR | 3 |
 | SCRUM-16 | Frontend (HTML/JS) covering both flows | AR | 5 |
-| SCRUM-17 | CI job for our team | AR | 2 |
-| SCRUM-18 | README + final smoke tests | All | 3 |
+| SCRUM-17 | CI job for our team | SN | 2 |
+| SCRUM-18 | README + final smoke tests | AR | 3 |
 
 ## 6. Conflict resolution
 
