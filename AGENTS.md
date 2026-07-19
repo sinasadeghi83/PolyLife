@@ -1,11 +1,35 @@
-# AGENTS.md — PolyLife (root)
+# AGENTS.md — SE1 (Software Engineering 1) course project
 
-> **Audience:** AI coding agents (and humans) working on any team in this
-> monorepo.
-> **Read this first**, then the team-specific `AGENTS.md` inside the team
-> folder you'll be modifying.
+> **Course:** Software Engineering 1 (مهندسی نرم افزار ۱) — Dr. Zakeri, Spring 1405
+> **University:** Amirkabir University of Technology (Tehran Polytechnic) —
+> Faculty of Computer Engineering
+> **Project name:** **PolyLife** — a diet & physical-fitness web platform on a
+> microservice architecture
+> **Team 7 (our team):** Sina Sadeghi (lead), Sina Negahban, Amirali Rahimi
+> **Chosen microservices:** Chat with Coach + Reserve Coach
 
----
+This repository is the **monorepo for the whole course** — eight student teams
+each build one microservice behind a shared Django "core". **You almost
+certainly want to read [`teams/team7/AGENTS.md`](teams/team7/AGENTS.md)
+instead of this file.** The rest of this document is general orientation.
+
+## 0. Course deliverables (what you have to submit)
+
+| Phase | Title | Status (team 7) |
+|-------|-------|-----------------|
+| P1 | Requirements + SRS | Submitted |
+| P2 | UML diagrams + wireframes | Submitted |
+| **P3** | **Microservice architecture & integration** | **In progress (this phase)** |
+| P4+ | TBA by course staff | — |
+
+Phase-3 brief: `docs/P3_SE1.pdf` (12 pages, Persian). Deadline: **28 Tir 1405
+(≈ 19 Jul 2026) at 23:59**. Evaluated **orally** — every team member must
+master the whole deliverable.
+
+The detailed Phase-3 plan for our team lives in
+[`teams/team7/.agents/`](teams/team7/.agents/) — start with
+`README.md` there, then `00_team_overview.md`, then
+`02_architecture_decisions.md`.
 
 ## 1. What this repo is
 
