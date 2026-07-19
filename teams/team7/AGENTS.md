@@ -145,11 +145,21 @@ docker compose exec backend bash
 > created on 2026-07-19 via the Atlassian REST API. It is **next-gen /
 > team-managed** (style verified via `GET /rest/api/3/project/SCRUM`).
 >
-> The Scrum board and the 18 Sprint 1 + Sprint 2 tickets listed in
-> `.agents/06_task_assignment.md` §4–§5 will be created next. Until then,
-> `.agents/06_task_assignment.md` is the source of truth.
+> The **17 sprint tickets** (SCRUM-1, 2, 4–10 from Sprint 1 + SCRUM-11–18
+> from Sprint 2) were created on 2026-07-19 via the Atlassian REST API.
+> All are in the `Sprint 1` or `Sprint 2` column (To Do) with the right
+> assignees and labels.
 >
-> **Note (recovered from an earlier mistake):** an intermediate project
+> **Note on key numbering:** The intended ticket sequence had no
+> SCRUM-3 (SCRUM-10 was dropped as redundant — see
+> `.agents/06_task_assignment.md` §4). The Jira internal counter assigned
+> keys sequentially as tickets were created, so the actual project keys
+> are SCRUM-1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18.
+> Each ticket's **summary** carries the original `[SCRUM-N]` label that
+> matches the docs (e.g. Jira key `SCRUM-4` has summary
+> `[SCRUM-3] Backend skeleton (FastAPI) + Dockerfile + compose`).
+>
+> **Recovered from an earlier mistake:** an intermediate project
 > `PolyLife — Team 7` with key `PL7` was briefly created and then deleted
 > because the user clarified to use the pre-existing `SE1 Team 7` (key
 > `SCRUM`) space. All ticket references in these docs now use `SCRUM`.
