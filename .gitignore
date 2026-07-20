@@ -43,6 +43,9 @@ coverage/
 # ===== Docker =====
 docker-compose.override.yml
 
+# ===== Hermes (local AI assistant scratch) =====
+.hermes/
+
 # ===== IDE / OS =====
 .idea/
 .vscode/
