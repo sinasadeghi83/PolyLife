@@ -31,10 +31,17 @@ git pull upstream main
 
 ## 2. Branching model
 
-The PDF forbids PRs to `main`. Allowed base branches: `development`, `feature`.
+**No PRs to `upstream`** (`PolyLife2026/PolyLife`). All PRs live inside our
+fork (`origin` = `sinasadeghi83/PolyLife`).
+
+Inside the fork, PRs may target any of these branches:
+
+- `main`            ← stable, the "blessed" tip of the fork
+- `development`     ← integration branch, cut from `main`
+- `feature/*`       ← short-lived per-ticket branches
 
 ```
-main              ← protected, never touched
+main              ← stable tip; PRs may land here inside the fork
 └── development   ← integration branch
     ├── feature/team-7-chat-threads
     ├── feature/team-7-reserve-availability
@@ -118,9 +125,10 @@ git commit -m "everything done"
 - Use GitHub inline comments; resolve before merge.
 
 ### 4.3 Merge
-- **Squash and merge** into `development`.
-- Never merge into `main` (PDF §۸.۴: PRs to `main` will be rejected without
-  review).
+- **Squash and merge** into `development`, `main`, or another `feature/*`
+  branch — whichever is the chosen PR target.
+- **Never open a PR against `upstream`** (`PolyLife2026/PolyLife`).
+  All PRs stay inside our fork (`origin` = `sinasadeghi83/PolyLife`).
 
 ## 5. Push schedule (PDF §زمان‌بندی Push کردن)
 
@@ -173,8 +181,11 @@ git archive --format=zip \
 
 ## 9. Things that are explicitly forbidden
 
-- ❌ Pushing directly to `main`.
+- ❌ Opening a PR against `upstream` (`PolyLife2026/PolyLife`).
 - ❌ `git push -f`.
 - ❌ Squashing multiple logical changes into one "everything done" commit.
 - ❌ Editing the root `requirements.txt` or the root `settings.py`.
 - ❌ Committing `.env` (real secrets).
+
+> Note: direct pushes / merges to `main` are fine **inside the fork**.
+> Only `upstream` is off-limits.

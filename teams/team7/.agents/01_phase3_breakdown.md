@@ -131,8 +131,9 @@ PowerShell mirrors exist in `scripts/windows/`. These satisfy the PDF's
 new scripts.
 
 ### C.7 Git & delivery
-- Fork `PolyLife` repo; never push to the original.
-- PR target branch: `development` **or** `feature` only — never `main`.
+- Fork `PolyLife` repo; **no PRs to upstream** (`PolyLife2026/PolyLife`).
+- All PRs stay inside our fork (`origin` = `sinasadeghi83/PolyLife`).
+  Allowed PR targets: **`main`**, **`development`**, or **`feature/*`**.
 - Commit format: `[team7] verb: description`
 - Every member commits individually, **incrementally** — no end-of-project dumps.
 - Push at the end of each working session, and at least **24 h before deadline**.

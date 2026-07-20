@@ -59,7 +59,9 @@
 
 ## E. Git & CI (§۸.۴ and §تست و CI)
 
-- [ ] Repo forked; PRs target `development` or `feature`, never `main`.
+- [ ] Repo forked; **no PRs to upstream** (`PolyLife2026/PolyLife`).
+      All PRs stay inside the fork (`origin` = `sinasadeghi83/PolyLife`)
+      and target `main`, `development`, or `feature/*`.
 - [ ] Commits follow `[team7] verb: description` format.
 - [ ] No "everything done" or "yesterday changes" commits.
 - [ ] Every member committed independently throughout the project.

@@ -105,8 +105,10 @@ teams/team7/
 5. **Commit message format:** `<gitmoji> [team7] <verb>: <description>` —
    see `.agents/07_git_workflow.md` §3.
 6. **Branch names:** `feature/team-7-<scope>-<short>`,
-   `bugfix/team-7-<short>`, `docs/team-7-<topic>`. PRs target
-   `feature` or `development` only (not `main`).
+   `bugfix/team-7-<short>`, `docs/team-7-<topic>`. **No PRs to
+   `upstream`** (`github.com/PolyLife2026/PolyLife`). All PRs stay
+   inside our fork (`origin` = `sinasadeghi83/PolyLife`) and may
+   target `main`, `development`, or another `feature/*` branch.
 7. **Never `git push -f`.** The PDF bans it; merge conflicts must be
    resolved manually.
 
@@ -154,7 +156,9 @@ docker compose exec backend bash
 4. **Make focused commits** with the gitmoji + `[team7]` format.
 5. **Push daily** (PDF §زمان‌بندی Push کردن) and **at least 24 h before
    the deadline**. End every working session with a push.
-6. **Open a PR to `feature` or `development`**, never to `main`.
+6. **Open a PR inside the fork** (`origin`). Allowed targets are
+   `main`, `development`, or another `feature/*` branch — **never
+   to `upstream`** (`github.com/PolyLife2026/PolyLife`).
 7. **Before requesting review**, run the smoke test in
    `.agents/08_implementation_checklist.md` §G and paste the output.
 
