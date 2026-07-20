@@ -53,8 +53,10 @@ backend + database.
 - **Never edit** the top-level `requirements.txt`, `Dockerfile`,
   `docker-compose.yml`, `polylife/settings.py`. PDF §۳.۳ forbids it. Add
   dependencies in your team's `requirements.txt` instead.
-- **Never push to `main`.** PRs target `feature/<name>` or
-  `development` (when it exists).
+- **No PRs to `upstream`** (`github.com/PolyLife2026/PolyLife`). All pull
+  requests stay inside our fork (`origin` = `sinasadeghi83/PolyLife`).
+  Inside the fork, PRs may target `main`, `development`, or
+  `feature/<name>` — pick the branch that fits the change.
 - **Never `git push -f`.**
 - **Commits** use the format `<gitmoji> [teamX] verb: description` —
   see your team's `.agents/07_git_workflow.md` for examples.

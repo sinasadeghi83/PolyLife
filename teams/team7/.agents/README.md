@@ -22,6 +22,7 @@ of the Software Engineering 1 project at Amirkabir University of Technology.
 | 06 | `06_task_assignment.md` | Who does what — Sina Sadeghi, Sina Negahban, Amirali Rahimi. |
 | 07 | `07_git_workflow.md` | Branching model, commit format, PR rules, push schedule. |
 | 08 | `08_implementation_checklist.md` | Final acceptance checklist + smoke-test script. |
+| 09 | `09_progress_tracking.md` | Agent workflow for evidence-based progress tracking across Jira, GitHub, tests, CI, and Scrum reports. |
 
 ---
 

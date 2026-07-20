@@ -33,22 +33,42 @@ routers (`/api/chat/...` and `/api/reserve/...`).
 | Transport (chat) | WebSocket | Real-time push required by P1. |
 | Tests | pytest + httpx + pytest-asyncio | Standard for FastAPI. |
 | Gateway | Nginx (template provided) | `auth_request` forward-auth to Core. |
+| Package manager | **uv** | PEP 668-friendly, lockfile-pinned, ~10-100x faster than pip; single source of truth is `teams/team7/backend/pyproject.toml` + `uv.lock`. |
+
+**Package manager rule:** this team uses **uv** for ALL Python
+dependency work in `teams/team7/backend/`. Do not create
+`requirements.txt`, do not run `pip install`, do not use `poetry` or
+`pipenv`. If you need a new dep:
+
+```bash
+cd teams/team7/backend
+uv add <package>          # runtime dep
+uv add --dev <package>    # dev-only dep (pytest, ruff, etc.)
+uv lock                   # regenerate uv.lock
+uv sync                   # install into the local .venv
+```
+
+The Docker build (`teams/team7/backend/Dockerfile`) is a multi-stage
+uv build and runs `uv sync --frozen` against the same lockfile, so
+local and container installs stay in lockstep.
 
 **Forbidden** by the PDF: editing the top-level `requirements.txt`,
 `Dockerfile`, `docker-compose.yml`, or `settings.py`. All deps go into
-`teams/team7/backend/requirements.txt` (created in Sprint 1).
+`teams/team7/backend/pyproject.toml` (and the lockfile uv generates
+beside it).
 
 ## 3. Folder layout (target after Sprint 1)
 
 ```
 teams/team7/
-├── AGENTS.md                ← you are here
-├── README.md                ← user-facing run instructions
-├── .agents/                 ← planning docs (do not delete)
-├── backend/                 ← our FastAPI service (Sprint 1 ticket SCRUM-4)
+├── AGENTS.md                <- you are here
+├── README.md                <- user-facing run instructions
+├── .agents/                 <- planning docs (do not delete)
+├── backend/                 <- our FastAPI service (Sprint 1 ticket SCRUM-4)
 │   ├── Dockerfile
-│   ├── requirements.txt
-│   ├── pyproject.toml
+│   ├── pyproject.toml       <- dep manifest (managed by `uv`)
+│   ├── uv.lock              <- pinned dep graph (committed; reproducible builds)
+│   ├── .python-version      <- 3.12 (consumed by uv)
 │   ├── alembic.ini
 │   └── app/
 │       ├── main.py
@@ -85,8 +105,10 @@ teams/team7/
 5. **Commit message format:** `<gitmoji> [team7] <verb>: <description>` —
    see `.agents/07_git_workflow.md` §3.
 6. **Branch names:** `feature/team-7-<scope>-<short>`,
-   `bugfix/team-7-<short>`, `docs/team-7-<topic>`. PRs target
-   `feature` or `development` only (not `main`).
+   `bugfix/team-7-<short>`, `docs/team-7-<topic>`. **No PRs to
+   `upstream`** (`github.com/PolyLife2026/PolyLife`). All PRs stay
+   inside our fork (`origin` = `sinasadeghi83/PolyLife`) and may
+   target `main`, `development`, or another `feature/*` branch.
 7. **Never `git push -f`.** The PDF bans it; merge conflicts must be
    resolved manually.
 
@@ -134,7 +156,9 @@ docker compose exec backend bash
 4. **Make focused commits** with the gitmoji + `[team7]` format.
 5. **Push daily** (PDF §زمان‌بندی Push کردن) and **at least 24 h before
    the deadline**. End every working session with a push.
-6. **Open a PR to `feature` or `development`**, never to `main`.
+6. **Open a PR inside the fork** (`origin`). Allowed targets are
+   `main`, `development`, or another `feature/*` branch — **never
+   to `upstream`** (`github.com/PolyLife2026/PolyLife`).
 7. **Before requesting review**, run the smoke test in
    `.agents/08_implementation_checklist.md` §G and paste the output.
 
