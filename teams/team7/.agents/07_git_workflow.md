@@ -63,7 +63,7 @@ main              ← stable tip; PRs may land here inside the fork
 1. Branch from `development`.
 2. Push often (end of every working session — see PDF §زمان‌بندی Push کردن).
 3. Open PR to `development` once code is ready.
-4. After approval + green CI, merge (squash).
+4. After approval + green CI, merge.
 5. Delete the branch.
 
 ## 3. Commit message format
@@ -125,7 +125,7 @@ git commit -m "everything done"
 - Use GitHub inline comments; resolve before merge.
 
 ### 4.3 Merge
-- **Squash and merge** into `development`, `main`, or another `feature/*`
+- **Merge** into `development`, `main`, or another `feature/*`
   branch — whichever is the chosen PR target.
 - **Never open a PR against `upstream`** (`PolyLife2026/PolyLife`).
   All PRs stay inside our fork (`origin` = `sinasadeghi83/PolyLife`).
