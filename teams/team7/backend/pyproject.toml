@@ -1,0 +1,44 @@
+[project]
+name = "team-7-backend"
+version = "0.1.0"
+description = "PolyLife Team 7 backend — Chat with Coach + Reserve Coach (FastAPI)."
+requires-python = ">=3.12"
+readme = "README.md"
+authors = [
+    { name = "Sina Sadeghi" },
+    { name = "Sina Negahban" },
+    { name = "Amirali Rahimi" },
+]
+
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "redis>=5.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.28",
+    "ruff>=0.7",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["app/tests"]
+pythonpath = ["."]
+cache_dir = "/tmp/.pytest_cache"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "SIM"]
+ignore = ["E501"]
