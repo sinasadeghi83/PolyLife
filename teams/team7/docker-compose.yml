@@ -18,22 +18,35 @@ services:
     # depends_on: [backend]
 
   # --- Your service (uncomment when ready) ---------------------------------
-  # backend:
-  #   build: .                          # builds this team's Django app
-  #   env_file: .env                    # DB creds & secret key come from .env
-  #   networks: [polylife, team]
-  #
-  # db:
-  #   image: postgres:16-alpine
-  #   env_file: .env                    # POSTGRES_DB/USER/PASSWORD from .env
-  #   volumes: [db-data:/var/lib/postgresql/data]
-  #   networks: [team]
+  backend:
+    build: .                          # builds this team's Django app
+    env_file: .env                    # DB creds & secret key come from .env
+    networks: [polylife, team]        # polylife -> reaches core; team -> reaches db + redis
+    depends_on:
+      db:
+        condition: service_healthy   # wait for pg_isready before starting the app
 
-# volumes:
-#   db-data:
+  db:
+    image: postgres:16-alpine
+    env_file: .env                    # POSTGRES_DB/USER/PASSWORD from .env
+    volumes: [db-data:/var/lib/postgresql/data]   # named volume keeps state across `down`
+    networks: [team]                  # private: only our backend can reach it
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U team7_user -d team7"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Redis: chat fan-out (pub/sub) + rate limiting. Ephemeral cache — no volume.
+  redis:
+    image: redis:7-alpine
+    networks: [team]                  # private: only our backend can reach it
+
+volumes:
+  db-data:                            # persists Postgres data across `down`
 
 networks:
   polylife:                             # shared with the core (gateway <-> core)
     external: true
     name: polylife_net
-  # team:                               # private app <-> db (uncomment with db)
+  team:                                 # private app <-> db <-> redis (team-internal)
