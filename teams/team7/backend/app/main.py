@@ -12,6 +12,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.meta import router as meta_router
 from app.core.config import settings
 
 logging.basicConfig(level=settings.log_level.upper())
@@ -37,6 +38,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    application.include_router(meta_router)
 
     @application.get("/healthz", tags=["meta"])
     async def healthz() -> dict[str, str]:
