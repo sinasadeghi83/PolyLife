@@ -24,9 +24,31 @@ class Settings(BaseSettings):
     )
 
     database_url: str = Field(
-        default="postgres://team7_user:team7pass@db:5432/team7",
-        description="Full SQLAlchemy/asyncpg connection string.",
+        default="postgres://team7_user:***@db:5432/team7",
+        description=(
+            "Full SQLAlchemy connection string. Async runtimes (Alembic, "
+            "the FastAPI app) consume ``database_url_async`` so the "
+            "asyncpg driver prefix is added automatically."
+        ),
     )
+
+    @property
+    def database_url_async(self) -> str:
+        """Return ``database_url`` coerced to ``postgresql+asyncpg://``.
+
+        SQLAlchemy's async engine refuses bare ``postgres://`` /
+        ``postgresql://`` URLs because it cannot infer the driver. The
+        async runtime (Alembic + FastAPI) must use this property instead
+        of ``database_url`` directly.
+        """
+        url = self.database_url
+        if url.startswith("postgresql+asyncpg://"):
+            return url
+        if url.startswith("postgres://"):
+            return "postgresql+asyncpg://" + url[len("postgres://") :]
+        if url.startswith("postgresql://"):
+            return "postgresql+asyncpg://" + url[len("postgresql://") :]
+        return url
 
     core_base_url: str = Field(
         default="http://core:8000",
