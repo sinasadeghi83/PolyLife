@@ -36,6 +36,9 @@ ENV PYTEST_CACHE_DIR=/tmp/.pytest_cache
 
 # Copy the prepared virtual environment and project files from the builder.
 COPY --from=builder /app /app
+# Test files (and any newly-added source) must remain readable by the
+# non-root ``app`` user that pytest runs as.
+RUN chmod -R a+rX /app/app
 
 USER app
 
