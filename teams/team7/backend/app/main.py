@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.chat import router as chat_router
 from app.api.meta import router as meta_router
+from app.api.reserve import router as reserve_router
 from app.core.config import settings
 
 logging.basicConfig(level=settings.log_level.upper())
@@ -42,6 +43,7 @@ def create_app() -> FastAPI:
 
     application.include_router(chat_router)
     application.include_router(meta_router)
+    application.include_router(reserve_router)
 
     @application.get("/healthz", tags=["meta"])
     async def healthz() -> dict[str, str]:
