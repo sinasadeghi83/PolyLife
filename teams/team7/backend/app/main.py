@@ -12,6 +12,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.chat import router as chat_router
 from app.api.meta import router as meta_router
 from app.core.config import settings
 
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    application.include_router(chat_router)
     application.include_router(meta_router)
 
     @application.get("/healthz", tags=["meta"])

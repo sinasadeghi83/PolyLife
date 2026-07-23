@@ -15,11 +15,10 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Text,
-    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import CommonBase
+from app.models.base import CommonBase, _utcnow
 
 
 class ChatMessage(CommonBase):
@@ -37,7 +36,7 @@ class ChatMessage(CommonBase):
     sent_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),
         nullable=False,
-        server_default=text("NOW()"),
+        default=_utcnow,
     )
     read_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=False),
