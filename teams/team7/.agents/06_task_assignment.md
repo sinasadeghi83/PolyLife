@@ -23,9 +23,10 @@ status_field: Jira status
 sprint_source: labels (sprint-sprint1 or sprint-sprint2)
 -->
 
-Last live verification: **2026-07-23**, through Jira REST API v3. The query
-returned **17 issues**. Jira's Sprint field is empty on these issues; sprint
-membership is encoded by the `sprint-sprint1` and `sprint-sprint2` labels.
+Last live verification: **2026-07-23** (post-SCRUM-8 sync), through Jira REST
+API v3. The query returned **17 issues**. Jira's Sprint field is empty on these
+issues; sprint membership is encoded by the `sprint-sprint1` and
+`sprint-sprint2` labels.
 
 Rules for humans and agents:
 
@@ -93,12 +94,12 @@ one happy-path endpoint for each service.
 | `SCRUM-5` | Postgres + Redis services in compose + update `.env.example` | `SS` | 2 | Done ✅ |
 | `SCRUM-6` | DB schema (all tables) + Alembic migrations | `SS` | 5 | Done ✅ |
 | `SCRUM-7` | `X-User-Id` dependency + smoke test | `SS` | 2 | Done ✅ |
-| `SCRUM-8` | Chat: list/create threads | `SS` | 3 | To Do ⬜ |
+| `SCRUM-8` | Chat: list/create threads | `SS` | 3 | Done ✅ |
 | `SCRUM-9` | Reserve: list/create availability | `SN` | 3 | To Do ⬜ |
 | `SCRUM-10` | Nginx gateway: extend with WebSocket route for `/api/chat/ws` | `AR` | 3 | To Do ⬜ |
 
-Sprint 1 totals: **23 points** — **14 Done**, **9 To Do**, **0 In Progress**,
-**0 Testing**. Completion by points: **60.9%**.
+Sprint 1 totals: **23 points** — **17 Done**, **6 To Do**, **0 In Progress**,
+**0 Testing**. Completion by points: **73.9%**.
 
 ### Sprint 2 — complete features, CI, frontend, and final verification
 
@@ -120,35 +121,33 @@ Sprint 2 totals: **31 points** — **0 Done**, **31 To Do**, **0 In Progress**,
 
 | Owner | Sprint 1 | Sprint 2 | Total | Done | Remaining |
 |---|---:|---:|---:|---:|---:|
-| `SS` | 15 | 8 | 23 | 12 | 11 |
+| `SS` | 15 | 8 | 23 | 15 | 8 |
 | `SN` | 3 | 10 | 13 | 0 | 13 |
 | `AR` | 5 | 13 | 18 | 2 | 16 |
-| **Team** | **23** | **31** | **54** | **14** | **40** |
+| **Team** | **23** | **31** | **54** | **17** | **37** |
 
-Current project state: **6 of 17 tickets Done**; **14 of 54 points Done
-(25.9%)**. All 11 remaining tickets are `To Do` in the verified snapshot.
+Current project state: **7 of 17 tickets Done**; **17 of 54 points Done
+(31.5%)**. All 10 remaining tickets are `To Do` in the verified snapshot.
 
 ## 4. Dependencies and recommended execution order
 
 This is coordination guidance, not a replacement for each Jira issue's
 acceptance criteria.
 
-1. Foundations `SCRUM-4` through `SCRUM-7` precede feature routers. They are
+1. Foundations `SCRUM-4` through `SCRUM-8` precede feature routers. They are
    currently marked Done in Jira.
-2. `SCRUM-8` establishes chat thread REST behavior before the WebSocket work in
-   `SCRUM-11`.
-3. `SCRUM-9` establishes availability behavior before atomic booking in
+2. `SCRUM-9` establishes availability behavior before atomic booking in
    `SCRUM-12`; ratings in `SCRUM-13` depend on completed appointment semantics.
-4. `SCRUM-10` supplies the gateway WebSocket route needed to demonstrate
+3. `SCRUM-10` supplies the gateway WebSocket route needed to demonstrate
    `SCRUM-11` through the authenticated integration path.
-5. `SCRUM-14` and `SCRUM-15` provide online-state and attachment capabilities
+4. `SCRUM-14` and `SCRUM-15` provide online-state and attachment capabilities
    consumed by the final frontend in `SCRUM-16`.
-6. `SCRUM-17` must exercise the Team 7 test suite before final acceptance.
-7. `SCRUM-18` is the final documentation and integrated smoke-test gate; it
+5. `SCRUM-17` must exercise the Team 7 test suite before final acceptance.
+6. `SCRUM-18` is the final documentation and integrated smoke-test gate; it
    should close only after applicable feature tickets and CI are complete.
 
-Safe parallel starting set from this snapshot: `SCRUM-8` (`SS`), `SCRUM-9`
-(`SN`), and `SCRUM-10` (`AR`).
+Safe parallel starting set from this snapshot: `SCRUM-9` (`SN`), `SCRUM-10`
+(`AR`), and `SCRUM-11` (`SS`).
 
 ## 5. Agent handoff protocol
 
