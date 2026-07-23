@@ -1,9 +1,9 @@
-"""Schemas for the Reserve Coach service (SCRUM-9).
+"""Schemas for the Reserve Coach service (SCRUM-9, SCRUM-12).
 
 These Pydantic models define the public request/response shape for
-``/api/reserve/coaches/.../availability``. They are intentionally separate
-from the SQLAlchemy ORM models so the wire contract can evolve independently
-of the schema.
+``/api/reserve/coaches/.../availability`` and ``/api/reserve/appointments``.
+They are intentionally separate from the SQLAlchemy ORM models so the wire
+contract can evolve independently of the schema.
 """
 
 from __future__ import annotations
@@ -83,3 +83,52 @@ class AvailabilityResponse(BaseModel):
     """Envelope for a single-slot response (PATCH)."""
 
     data: AvailabilityRead
+
+
+# ---------------------------------------------------------------------------
+# Appointment schemas (SCRUM-12)
+# ---------------------------------------------------------------------------
+
+
+class AppointmentRead(BaseModel):
+    """Public shape of a single appointment."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    coach_user_id: int
+    user_id: int
+    availability_id: int
+    status: str
+    notes: str | None
+    created_at: datetime
+    updated_at: datetime | None
+
+
+class AppointmentCreateRequest(BaseModel):
+    """POST body for booking an availability slot."""
+
+    availability_id: int = Field(gt=0, description="ID of the open slot to book.")
+    notes: str | None = None
+
+
+class AppointmentResponse(BaseModel):
+    """Envelope for a single appointment response."""
+
+    data: AppointmentRead
+
+
+class AppointmentListResponse(BaseModel):
+    """Envelope for ``GET /api/reserve/appointments``."""
+
+    data: list[AppointmentRead]
+
+
+class AppointmentUpdateRequest(BaseModel):
+    """PATCH body for updating an appointment status.
+
+    Only terminal or rescheduled states are accepted here. ``confirmed``
+    is the initial state set at booking time and cannot be re-applied.
+    """
+
+    status: Literal["cancelled", "completed", "no_show"]
