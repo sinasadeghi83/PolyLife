@@ -1,4 +1,4 @@
-"""Reserve Coach HTTP router (SCRUM-9, SCRUM-12).
+"""Reserve Coach HTTP router (SCRUM-9, SCRUM-12, SCRUM-13).
 
 Public, gateway-facing routes are ``/api/reserve/...``; the Nginx layer
 prefixes ``/api/`` via ``proxy_pass`` without a URI rewrite, so the
@@ -17,6 +17,10 @@ Endpoints (SCRUM-12 — appointments):
   GET    /reserve/appointments                         — list own appointments
   GET    /reserve/appointments/{appointment_id}        — get appointment detail
   PATCH  /reserve/appointments/{appointment_id}        — update status (participant)
+
+Endpoints (SCRUM-13 — ratings):
+  POST   /reserve/coaches/{coach_user_id}/ratings      — leave a rating (user)
+  GET    /reserve/coaches/{coach_user_id}/ratings      — list ratings for a coach
 """
 
 from __future__ import annotations
@@ -40,10 +44,19 @@ from app.schemas.reserve import (
     AvailabilityRead,
     AvailabilityResponse,
     AvailabilityUpdateRequest,
+    RatingCreateRequest,
+    RatingListResponse,
+    RatingRead,
+    RatingResponse,
 )
 from app.services import reserve as reserve_service
 
 router = APIRouter(prefix="/reserve", tags=["reserve"])
+
+
+# ---------------------------------------------------------------------------
+# Availability endpoints (SCRUM-9)
+# ---------------------------------------------------------------------------
 
 
 @router.get(
@@ -301,3 +314,57 @@ async def update_appointment(
         session, appointment, new_status=payload.status
     )
     return AppointmentResponse(data=AppointmentRead.model_validate(updated))
+
+
+# ---------------------------------------------------------------------------
+# Rating endpoints (SCRUM-13)
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/coaches/{coach_user_id}/ratings",
+    status_code=status.HTTP_201_CREATED,
+    response_model=RatingResponse,
+)
+async def create_rating(
+    coach_user_id: int,
+    payload: RatingCreateRequest,
+    current_user: CurrentUser = Depends(get_current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_db),  # noqa: B008
+) -> RatingResponse:
+    """Leave a 1–5 rating on a coach.
+
+    Returns 404 if the coach does not exist. Returns 409 if the caller
+    has already rated this coach. Returns 422 if the caller tries to
+    rate themselves.
+    """
+
+    if coach_user_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="You cannot rate yourself.",
+        )
+
+    row = await reserve_service.create_rating(
+        session,
+        coach_user_id=coach_user_id,
+        user_id=current_user.id,
+        rating=payload.rating,
+        comment=payload.comment,
+    )
+    return RatingResponse(data=RatingRead.model_validate(row))
+
+
+@router.get(
+    "/coaches/{coach_user_id}/ratings",
+    response_model=RatingListResponse,
+)
+async def list_ratings(
+    coach_user_id: int,
+    current_user: CurrentUser = Depends(get_current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_db),  # noqa: B008
+) -> RatingListResponse:
+    """List all ratings for a coach, newest first."""
+
+    rows = await reserve_service.list_ratings(session, coach_user_id)
+    return RatingListResponse(data=[RatingRead.model_validate(r) for r in rows])

@@ -1,4 +1,4 @@
-"""Reserve Coach service layer (SCRUM-9, SCRUM-12).
+"""Reserve Coach service layer (SCRUM-9, SCRUM-12, SCRUM-13).
 
 Pure database functions for the Reserve Coach availability and appointment
 endpoints. The HTTP layer in ``app.api.reserve`` depends on these so router
@@ -27,7 +27,12 @@ from app.models.appointment import Appointment
 from app.models.base import _utcnow
 from app.models.coach_availability import CoachAvailability
 from app.models.coach_profile import CoachProfile
+from app.models.coach_rating import CoachRating
 from app.schemas.reserve import SlotInput
+
+# ---------------------------------------------------------------------------
+# Availability functions (SCRUM-9)
+# ---------------------------------------------------------------------------
 
 
 async def coach_profile_exists(session: AsyncSession, coach_user_id: int) -> bool:
@@ -295,3 +300,71 @@ async def update_appointment_status(
     await session.commit()
     await session.refresh(appointment)
     return appointment
+
+
+# ---------------------------------------------------------------------------
+# Rating functions (SCRUM-13)
+# ---------------------------------------------------------------------------
+
+
+async def create_rating(
+    session: AsyncSession,
+    *,
+    coach_user_id: int,
+    user_id: int,
+    rating: int,
+    comment: str | None = None,
+) -> CoachRating:
+    """Create a rating for a coach left by a user.
+
+    Raises ``HTTPException(409)`` if the user has already rated this coach
+    (unique constraint on ``(coach_user_id, user_id)``) or if the coach
+    profile does not exist (404). The caller is responsible for ensuring
+    the user is not rating themselves before calling this function.
+    """
+
+    if not await coach_profile_exists(session, coach_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Coach not found.",
+        )
+
+    row = CoachRating(
+        coach_user_id=coach_user_id,
+        user_id=user_id,
+        rating=rating,
+        comment=comment,
+    )
+    session.add(row)
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You have already rated this coach.",
+        ) from None
+
+    await session.refresh(row)
+    return row
+
+
+async def list_ratings(
+    session: AsyncSession,
+    coach_user_id: int,
+) -> Sequence[CoachRating]:
+    """Return all active ratings for a coach, newest first.
+
+    Soft-deleted ratings are excluded.
+    """
+
+    stmt = (
+        select(CoachRating)
+        .where(
+            CoachRating.coach_user_id == coach_user_id,
+            CoachRating.is_deleted.is_(False),
+        )
+        .order_by(CoachRating.created_at.desc())
+    )
+    result = await session.execute(stmt)
+    return list(result.scalars().all())

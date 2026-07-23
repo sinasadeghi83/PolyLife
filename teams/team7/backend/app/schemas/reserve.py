@@ -1,9 +1,10 @@
-"""Schemas for the Reserve Coach service (SCRUM-9, SCRUM-12).
+"""Schemas for the Reserve Coach service (SCRUM-9, SCRUM-12, SCRUM-13).
 
 These Pydantic models define the public request/response shape for
-``/api/reserve/coaches/.../availability`` and ``/api/reserve/appointments``.
-They are intentionally separate from the SQLAlchemy ORM models so the wire
-contract can evolve independently of the schema.
+``/api/reserve/coaches/.../availability``, ``/api/reserve/appointments``,
+and ``/api/reserve/coaches/.../ratings``. They are intentionally separate
+from the SQLAlchemy ORM models so the wire contract can evolve independently
+of the schema.
 """
 
 from __future__ import annotations
@@ -13,6 +14,9 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+# ---------------------------------------------------------------------------
+# Availability schemas (SCRUM-9)
+# ---------------------------------------------------------------------------
 
 class AvailabilityRead(BaseModel):
     """Public shape of a single availability slot."""
@@ -132,3 +136,41 @@ class AppointmentUpdateRequest(BaseModel):
     """
 
     status: Literal["cancelled", "completed", "no_show"]
+
+
+# ---------------------------------------------------------------------------
+# Rating schemas (SCRUM-13)
+# ---------------------------------------------------------------------------
+
+
+class RatingRead(BaseModel):
+    """Public shape of a single coach rating."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    coach_user_id: int
+    user_id: int
+    rating: int
+    comment: str | None
+    created_at: datetime
+    updated_at: datetime | None
+
+
+class RatingCreateRequest(BaseModel):
+    """POST body for leaving a rating on a coach."""
+
+    rating: int = Field(ge=1, le=5, description="Rating value between 1 and 5.")
+    comment: str | None = None
+
+
+class RatingResponse(BaseModel):
+    """Envelope for a single rating response."""
+
+    data: RatingRead
+
+
+class RatingListResponse(BaseModel):
+    """Envelope for ``GET /api/reserve/coaches/{coach_user_id}/ratings``."""
+
+    data: list[RatingRead]
