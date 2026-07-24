@@ -19,7 +19,7 @@ from collections.abc import Sequence
 from datetime import datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +28,158 @@ from app.models.base import _utcnow
 from app.models.coach_availability import CoachAvailability
 from app.models.coach_profile import CoachProfile
 from app.models.coach_rating import CoachRating
-from app.schemas.reserve import SlotInput
+from app.schemas.reserve import CoachProfileUpsertRequest, SlotInput
+
+# ---------------------------------------------------------------------------
+# Coach-profile functions (SCRUM-9)
+# ---------------------------------------------------------------------------
+
+
+def _coach_profile_payload_from_row(row: dict) -> dict:
+    """Convert a SQLAlchemy mapping row to the public coach-profile payload."""
+
+    avg_rating = row.get("avg_rating")
+    rating_count = row.get("rating_count")
+
+    return {
+        "id": row["id"],
+        "user_id": row["user_id"],
+        "bio": row["bio"],
+        "specialties": row["specialties"],
+        "hourly_rate": row["hourly_rate"],
+        "years_experience": row["years_experience"],
+        "is_online": row["is_online"],
+        "avg_rating": float(avg_rating) if avg_rating is not None else None,
+        "rating_count": int(rating_count or 0),
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+async def list_coach_profiles(
+    session: AsyncSession,
+    *,
+    specialty: str | None = None,
+    min_rating: float | None = None,
+) -> list[dict]:
+    """List active coach profiles with optional specialty/min-rating filters."""
+
+    stmt = (
+        select(
+            CoachProfile.id,
+            CoachProfile.user_id,
+            CoachProfile.bio,
+            CoachProfile.specialties,
+            CoachProfile.hourly_rate,
+            CoachProfile.years_experience,
+            CoachProfile.is_online,
+            CoachProfile.created_at,
+            CoachProfile.updated_at,
+            func.avg(CoachRating.rating).label("avg_rating"),
+            func.count(CoachRating.id).label("rating_count"),
+        )
+        .outerjoin(
+            CoachRating,
+            (CoachRating.coach_user_id == CoachProfile.user_id)
+            & (CoachRating.is_deleted.is_(False)),
+        )
+        .where(CoachProfile.is_deleted.is_(False))
+        .group_by(
+            CoachProfile.id,
+            CoachProfile.user_id,
+            CoachProfile.bio,
+            CoachProfile.specialties,
+            CoachProfile.hourly_rate,
+            CoachProfile.years_experience,
+            CoachProfile.is_online,
+            CoachProfile.created_at,
+            CoachProfile.updated_at,
+        )
+        .order_by(CoachProfile.id.asc())
+    )
+
+    result = await session.execute(stmt)
+    rows = [
+        _coach_profile_payload_from_row(dict(r))
+        for r in result.mappings().all()
+    ]
+
+    if specialty is not None:
+        wanted = specialty.strip().lower()
+        rows = [
+            row
+            for row in rows
+            if row["specialties"]
+            and any(s.lower() == wanted for s in row["specialties"])
+        ]
+
+    if min_rating is not None:
+        rows = [
+            row for row in rows if row["avg_rating"] is not None and row["avg_rating"] >= min_rating
+        ]
+
+    return rows
+
+
+async def get_coach_profile(session: AsyncSession, coach_user_id: int) -> dict | None:
+    """Return one active coach profile with rating aggregates or ``None``."""
+
+    rows = await list_coach_profiles(session)
+    for row in rows:
+        if row["user_id"] == coach_user_id:
+            return row
+    return None
+
+
+async def upsert_coach_profile(
+    session: AsyncSession,
+    *,
+    coach_user_id: int,
+    payload: CoachProfileUpsertRequest,
+) -> dict:
+    """Create or update the coach profile for ``coach_user_id``."""
+
+    stmt = select(CoachProfile).where(CoachProfile.user_id == coach_user_id)
+    existing = (await session.execute(stmt)).scalar_one_or_none()
+
+    if existing is None:
+        if payload.hourly_rate is None:
+            raise ValueError("hourly_rate is required when creating a coach profile")
+
+        existing = CoachProfile(
+            user_id=coach_user_id,
+            bio=payload.bio,
+            specialties=payload.specialties,
+            hourly_rate=payload.hourly_rate,
+            years_experience=payload.years_experience,
+            is_online=payload.is_online if payload.is_online is not None else False,
+            is_deleted=False,
+        )
+        session.add(existing)
+    else:
+        existing.is_deleted = False
+        if payload.bio is not None:
+            existing.bio = payload.bio
+        if payload.specialties is not None:
+            existing.specialties = payload.specialties
+        if payload.hourly_rate is not None:
+            existing.hourly_rate = payload.hourly_rate
+        if payload.years_experience is not None:
+            existing.years_experience = payload.years_experience
+        if payload.is_online is not None:
+            existing.is_online = payload.is_online
+        existing.updated_at = _utcnow()
+
+    await session.commit()
+
+    row = await get_coach_profile(session, coach_user_id)
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to load coach profile after upsert.",
+        )
+    return row
+
 
 # ---------------------------------------------------------------------------
 # Availability functions (SCRUM-9)

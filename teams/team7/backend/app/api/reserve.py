@@ -44,6 +44,10 @@ from app.schemas.reserve import (
     AvailabilityRead,
     AvailabilityResponse,
     AvailabilityUpdateRequest,
+    CoachProfileListResponse,
+    CoachProfileRead,
+    CoachProfileResponse,
+    CoachProfileUpsertRequest,
     RatingCreateRequest,
     RatingListResponse,
     RatingRead,
@@ -52,6 +56,71 @@ from app.schemas.reserve import (
 from app.services import reserve as reserve_service
 
 router = APIRouter(prefix="/reserve", tags=["reserve"])
+
+
+# ---------------------------------------------------------------------------
+# Coach-profile endpoints (SCRUM-9)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/coaches", response_model=CoachProfileListResponse)
+async def list_coaches(
+    specialty: str | None = Query(default=None),  # noqa: B008
+    min_rating: float | None = Query(default=None, ge=1, le=5),  # noqa: B008
+    current_user: CurrentUser = Depends(get_current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_db),  # noqa: B008
+) -> CoachProfileListResponse:
+    """List active coach profiles with optional specialty/min-rating filters."""
+
+    rows = await reserve_service.list_coach_profiles(
+        session,
+        specialty=specialty,
+        min_rating=min_rating,
+    )
+    return CoachProfileListResponse(
+        data=[CoachProfileRead.model_validate(r) for r in rows]
+    )
+
+
+@router.get("/coaches/{coach_user_id}", response_model=CoachProfileResponse)
+async def get_coach(
+    coach_user_id: int,
+    current_user: CurrentUser = Depends(get_current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_db),  # noqa: B008
+) -> CoachProfileResponse:
+    """Get one active coach profile and its rating aggregates."""
+
+    row = await reserve_service.get_coach_profile(session, coach_user_id)
+    if row is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Coach profile not found.",
+        )
+
+    return CoachProfileResponse(data=CoachProfileRead.model_validate(row))
+
+
+@router.post("/coaches/me", response_model=CoachProfileResponse)
+async def upsert_my_coach_profile(
+    payload: CoachProfileUpsertRequest,
+    current_user: CurrentUser = Depends(get_current_user),  # noqa: B008
+    session: AsyncSession = Depends(get_db),  # noqa: B008
+) -> CoachProfileResponse:
+    """Create or update the caller's coach profile."""
+
+    try:
+        row = await reserve_service.upsert_coach_profile(
+            session,
+            coach_user_id=current_user.id,
+            payload=payload,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+
+    return CoachProfileResponse(data=CoachProfileRead.model_validate(row))
 
 
 # ---------------------------------------------------------------------------

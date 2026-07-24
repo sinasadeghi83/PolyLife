@@ -1,22 +1,74 @@
 """Schemas for the Reserve Coach service (SCRUM-9, SCRUM-12, SCRUM-13).
 
 These Pydantic models define the public request/response shape for
-``/api/reserve/coaches/.../availability``, ``/api/reserve/appointments``,
-and ``/api/reserve/coaches/.../ratings``. They are intentionally separate
-from the SQLAlchemy ORM models so the wire contract can evolve independently
-of the schema.
+``/api/reserve/coaches``, ``/api/reserve/coaches/{coach_user_id}``,
+``/api/reserve/coaches/me``, ``/api/reserve/coaches/.../availability``,
+``/api/reserve/appointments``, and ``/api/reserve/coaches/.../ratings``.
+They are intentionally separate from the SQLAlchemy ORM models so the wire
+contract can evolve independently of the schema.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
+from decimal import Decimal
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 # ---------------------------------------------------------------------------
+# Coach-profile schemas (SCRUM-9)
+# ---------------------------------------------------------------------------
+
+
+class CoachProfileRead(BaseModel):
+    """Public shape of a single coach profile with rating aggregates."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    bio: str | None
+    specialties: list[str] | None
+    hourly_rate: Decimal
+    years_experience: int | None
+    is_online: bool
+    avg_rating: float | None
+    rating_count: int
+    created_at: datetime
+    updated_at: datetime | None
+
+
+class CoachProfileUpsertRequest(BaseModel):
+    """POST body for creating/updating the caller's coach profile."""
+
+    bio: str | None = None
+    specialties: list[str] | None = None
+    hourly_rate: Decimal | None = Field(
+        default=None,
+        gt=0,
+        description="Hourly rate of the coach; required on first create.",
+    )
+    years_experience: int | None = Field(default=None, ge=0)
+    is_online: bool | None = None
+
+
+class CoachProfileResponse(BaseModel):
+    """Envelope for a single coach profile response."""
+
+    data: CoachProfileRead
+
+
+class CoachProfileListResponse(BaseModel):
+    """Envelope for ``GET /api/reserve/coaches``."""
+
+    data: list[CoachProfileRead]
+
+
+# ---------------------------------------------------------------------------
 # Availability schemas (SCRUM-9)
 # ---------------------------------------------------------------------------
+
 
 class AvailabilityRead(BaseModel):
     """Public shape of a single availability slot."""
